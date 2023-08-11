@@ -1,17 +1,25 @@
 import React, { useState } from 'react';
-import ScrollToTopOnPageChange from '../component/Actualiser';
+import ScrollToTopOnPageChange from '../utlités/Actualiser';
 import login from "../assetsLearning/login2.jpg";
 import logo from "../assetsLearning/logoblanc.png";
 import { BiHide, BiShow } from "react-icons/bi";
-import { Link , useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
+import { useDispatch, useSelector } from 'react-redux';
+import { loginRedux } from '../redux/userSlice';
 const Authentification = () => {
     const [showMDP, setShowMDP] = useState(false)
     const [data, setData] = useState({
-        email: "",
-        password: ""
-    })
-    const navigate= useNavigate();
+        email:"",
+        password:"",
+    });
+    const navigate = useNavigate();
+    const userData=useSelector(state =>state)
+
+    //const [user,setusers]=useState({})
+   
+    const dispatch=useDispatch()
+
     console.log(data)
     const handleShowMDP = () => {
         setShowMDP(previous => !previous)
@@ -26,9 +34,10 @@ const Authentification = () => {
             }
         })
     }
+
     const handleSubmit = async (e) => {
-        e.preventDefault()
-        const { email, password } = data
+        e.preventDefault();
+        const { email, password,nom, role } = data; 
         if (email && password) {
             const fetchData = await fetch(`${process.env.REACT_APP_SERVER_DOMAIN}/Authentification`, {
                 method: "POST",
@@ -36,19 +45,34 @@ const Authentification = () => {
                     "content-type": "application/json"
                 },
                 body: JSON.stringify(data)
-            })
-            const dataRes=await fetchData.json()
+            });
+            const dataRes = await fetchData.json();
+            toast( dataRes.message )
+            //toast(userData.user.role )
             console.log(dataRes);
-            toast(dataRes.message);
-            if(dataRes.alert){
+            
+            //setusers(dataRes)
+            if (dataRes.alert) {
+                dispatch(loginRedux(dataRes));  
                 
+                if (role === "etudiant") {
                     navigate("/");
-               
+                } else if (role === "formateur") {
+                    navigate("/Deposer");
+                } else {
+                    toast("Rôle invalide.");
+                }
+                
+           console.log(userData);
             }
+           
+            
         } else {
-            toast("Veuillez remplir tous les champs")
+            toast("Veuillez remplir tous les champs");
         }
-    }
+    };
+
+
     return (
         <div>
             <ScrollToTopOnPageChange />
@@ -98,9 +122,32 @@ const Authentification = () => {
                                     </div>
 
                                     <form action="" className="sm:w-2/3 w-full px-4 lg:px-0 mx-auto" onSubmit={handleSubmit}>
+                                        <input
+                                            type="radio"
+                                            name="role"
+                                            value="etudiant"
+                                            checked={data.role === "etudiant"}
+                                            onChange={handleOnChange}
+                                            id="etudiant"
+                                            className="mr-2"
+                                        />
+                                        <label htmlFor="etudiant">Etudiant</label>
+
+                                        <input
+                                            type="radio"
+                                            name="role"
+                                            value="formateur"
+                                            checked={data.role === "formateur"}
+                                            onChange={handleOnChange}
+                                            id="formateur"
+                                            className="ml-4 mr-2"
+                                        />
+                                        <label htmlFor="formateur">Formateur</label>
                                         <div className="pb-2 pt-4">
                                             <input type="email" name="email" value={data.email} onChange={handleOnChange} id="email" placeholder="Email" class="block w-full p-4 text-lg rounded-sm bg-gray-800" />
                                         </div>
+
+
                                         <div className="pb-2 pt-4 flex bg-gray-800 p-4 mt-2 focus-within:outline focus-within:outline-gray-50 focus-within:border-1 ">
                                             <input class="block w-full  text-lg outline-none border-none bg-gray-800 " value={data.password} onChange={handleOnChange} type={showMDP ? "text" : "password"} name="password" id="password" placeholder="Password" />
                                             <span className="flex text-xl" value={data.cpassword} onClick={handleShowMDP}>{showMDP ? <BiHide /> : <BiShow />}</span>

@@ -5,9 +5,11 @@ import Cours from "../assetsLearning/lancerCours.png"
 import zakaria from "../assetsLearning/zakaria.png";
 import samiha from "../assetsLearning/samiha.jpeg";
 import formateur from "../assetsLearning/formateur.jpg";
-import ScrollToTopOnPageChange from '../component/Actualiser';
+import ScrollToTopOnPageChange from '../utlités/Actualiser';
 import { Link } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 const Enseigner = () => {
+    const userData = useSelector((state) => state.user)
     return (
         <div>
             <ScrollToTopOnPageChange />
@@ -28,18 +30,12 @@ const Enseigner = () => {
                     <div class="container mx-auto px-6 py-16 text-center">
                         <div class="mx-auto max-w-lg">
 
-                            <Link to={"../Authentification"} className="nav-link">
-                                <a href="#" class="text-3xl font-bold text-gray-800 lg:text-4xl font-goldman">
-                                    <h6>Ayez un impact global</h6>
-                                </a>
-                            </Link>
                             <p class="mt-6 text-gray-500 dark:text-gray-500">Construisez votre cours en ligne et monétisez votre expertise en partageant votre savoir partout dans le monde.
 
                             </p>
                             <button class="mt-6 rounded-lg bg-blue-600 px-6 py-2.5 text-center text-sm font-medium capitalize leading-5 text-white hover:bg-blue-500 focus:outline-none lg:mx-0 lg:w-auto">
-                                <Link to={"../Authentification"} className="nav-link">
+                                <Link to={  userData.role === "formateur"?"../Deposer" : "../Authentification" } className="nav-link">
                                     Ayez un impact global
-
                                 </Link></button>
                             <p class="mt-3 text-sm text-gray-400">Aucune carte de crédit n'est requise</p>
                         </div>
@@ -176,7 +172,16 @@ const Enseigner = () => {
                     </p>
                 </section>
 
-                {/*<section class="min-h-screen bg-gradient-to-r from-blue-600 via-blue-800 to-blue-900 dark:from-gray-700 dark:via-gray-800 dark:to-gray-900">
+                
+
+
+            </main>
+        </div>
+    )
+}
+export default Enseigner;
+
+{/*<section class="min-h-screen bg-gradient-to-r from-blue-600 via-blue-800 to-blue-900 dark:from-gray-700 dark:via-gray-800 dark:to-gray-900">
                     <div class="container mx-auto flex justify-center items-center min-h-screen flex-col px-6 py-12 ">
                         <div class="flex-1 lg:-mx-6 lg:flex lg:items-center ">
                             <div class="text-white lg:mx-6 lg:w-1/2">
@@ -223,15 +228,6 @@ const Enseigner = () => {
                         </div>
                     </div>
     </section>*/}
-
-
-            </main>
-        </div>
-    )
-}
-export default Enseigner;
-
-
 //Link Lumanosimo:
 //<link rel="preconnect" href="https://fonts.googleapis.com">
 //<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

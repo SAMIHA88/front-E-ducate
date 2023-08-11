@@ -3,7 +3,7 @@ import React from 'react'
 import zakaria from "../assetsLearning/zakaria.png";
 
 import samiha from "../assetsLearning/samiha.jpeg";
-import ScrollToTopOnPageChange from '../component/Actualiser';
+import ScrollToTopOnPageChange from '../utlités/Actualiser';
 const Enseigner = () => {
     return (
         <div>

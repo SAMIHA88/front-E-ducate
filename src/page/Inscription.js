@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import ScrollToTopOnPageChange from '../component/Actualiser';
+import ScrollToTopOnPageChange from '../utlités/Actualiser';
 import login from "../assetsLearning/login.jpg";
 import profil from "../assetsLearning/profile.png";
 import { Link, useNavigate } from 'react-router-dom';
@@ -7,14 +7,27 @@ import { BiHide, BiShow } from "react-icons/bi";
 import { AiOutlineCloudUpload } from 'react-icons/ai';
 import { ImageToBase64 } from '../utlités/ImageToBase64';
 import { toast } from 'react-hot-toast';
+
+const isEmailValid = (email) => {
+    const emailRegex = /^[a-zA-Z][a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+    return emailRegex.test(email);
+  };
+  
+  const isNameValid = (name) => {
+    const nameRegex = /^[a-zA-Z\s]*$/;
+    return nameRegex.test(name);
+  };
+
 const Inscription = () => {
     const [showMDP, setShowMDP] = useState(false)
     const [showCMDP, setShowCMDP] = useState(false)
     const [data, setData] = useState({
         email: "",
+        nom:"",
         password: "",
         cpassword: "",
-        profileImage: ""
+        profileImage: "",
+        role: ""
     })
     console.log(data)
     const handleShowMDP = () => {
@@ -44,34 +57,44 @@ const Inscription = () => {
         })
     }
     console.log(process.env.REACT_APP_SERVER_DOMAIN)
+   
     const handleSubmit = async (e) => {
-        e.preventDefault()
-        const { email, password, cpassword } = data
-        if (email && password && cpassword) {
-            if (password === cpassword) {
-                const fetchData = await fetch(`${process.env.REACT_APP_SERVER_DOMAIN}/Inscription`, {
-                    method: "POST",
-                    headers: {
-                        "content-type": "application/json"
-                    },
-                    body: JSON.stringify(data)
-                })
-                const dataRes=await fetchData.json()
-                console.log(dataRes);
-
-                //alert(dataRes.message);
-                toast(dataRes.message);
-                if(dataRes.alert){
-                    navigate("/Authentification")
-                }
-                
+        e.preventDefault();
+    
+        const { nom, email, password, cpassword, role } = data;
+    
+        if (nom && email && password && cpassword && role) {
+          if (password === cpassword) {
+            if (isEmailValid(email) && isNameValid(nom)) {
+              const fetchData = await fetch(`${process.env.REACT_APP_SERVER_DOMAIN}/Inscription`, {
+                method: "POST",
+                headers: {
+                  "content-type": "application/json"
+                },
+                body: JSON.stringify(data)
+              });
+    
+              const dataRes = await fetchData.json();
+              console.log(dataRes);
+    
+              toast(dataRes.message);
+              if (dataRes.alert) {
+                navigate("/Authentification");
+              }
             } else {
-                toast("Mots de passe différents")
+              if (!isNameValid(nom)) {
+                toast("Nom invalide : utilisez uniquement des lettres");
+              } else {
+                toast("Adresse email invalide");
+              }
             }
+          } else {
+            toast("Mots de passe différents");
+          }
         } else {
-            toast("Veuillez remplir tous les champs")
+          toast("Veuillez remplir tous les champs");
         }
-    }
+      };
     const navigate = useNavigate()
     return (
         <div>
@@ -132,9 +155,36 @@ const Inscription = () => {
                                     </div>
 
                                     <form action="" className="sm:w-2/3 w-full px-4 lg:px-0 mx-auto" onSubmit={handleSubmit}>
+                                        <div className="pb-2 pt-4 text-xl ">
+                                           
+                                            <div className="flex items-center justify-center">
+                                                <input
+                                                    type="radio"
+                                                    name="role"
+                                                    value="etudiant"
+                                                    checked={data.role === "etudiant"}
+                                                    onChange={handleOnChange}
+                                                    className="mr-2"
+                                                />
+                                                <label htmlFor="etudiant" className="text-gray-100 mr-4">Étudiant</label>
+                                                <input
+                                                    type="radio"
+                                                    name="role"
+                                                    value="formateur"
+                                                    checked={data.role === "formateur"}
+                                                    onChange={handleOnChange}
+                                                    className="mr-2"
+                                                />
+                                                <label htmlFor="formateur" className="text-gray-100">Formateur</label>
+                                            </div>
+                                        </div>
+                                        <div className="pb-2 pt-4">
+                                            <input type="text" name="nom" value={data.nom} onChange={handleOnChange} id="nom" placeholder="Nom Complet" class="block w-full p-4 text-lg rounded-sm bg-gray-800" />
+                                        </div>
                                         <div className="pb-2 pt-4">
                                             <input type="email" name="email" value={data.email} onChange={handleOnChange} id="email" placeholder="Email" class="block w-full p-4 text-lg rounded-sm bg-gray-800" />
                                         </div>
+
                                         <div className="pb-2 pt-4 flex bg-gray-800 p-4 mt-2 focus-within:outline focus-within:outline-gray-50 focus-within:border-1 ">
                                             <input class="block w-full  text-lg outline-none border-none bg-gray-800 " value={data.password} onChange={handleOnChange} type={showMDP ? "text" : "password"} name="password" id="password" placeholder="Password" />
                                             <span className="flex text-xl" value={data.cpassword} onClick={handleShowMDP}>{showMDP ? <BiHide /> : <BiShow />}</span>
